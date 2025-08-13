@@ -7,15 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.util.Set;
 
 @Entity
-@Table(name = "items")
+@Table(name = "user_groups")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class Item {
+public class UserGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,17 +23,6 @@ public class Item {
 
     @Column(nullable = false)
     private String name;
-
-    @Column()
-    private String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id")
-    private Collection collection;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_group_id", nullable = false)
-    private UserGroup userGroup;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -43,9 +32,13 @@ public class Item {
     private User createdBy;
 
     @Column(name = "updated_at", updatable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private User updatedBy;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_group_members", joinColumns = @JoinColumn(name = "user_group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> members;
 }

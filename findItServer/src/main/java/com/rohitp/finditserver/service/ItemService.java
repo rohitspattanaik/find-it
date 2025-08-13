@@ -1,11 +1,10 @@
 package com.rohitp.finditserver.service;
 
-import com.rohitp.finditserver.dto.items.CreateItemRequest;
-import com.rohitp.finditserver.dto.items.UpdateItemRequest;
-import com.rohitp.finditserver.exception.ItemNotFoundException;
+import com.rohitp.finditserver.dto.item.CreateItemRequest;
+import com.rohitp.finditserver.dto.item.UpdateItemRequest;
+import com.rohitp.finditserver.exception.item.ItemNotFoundException;
 import com.rohitp.finditserver.model.Item;
 import com.rohitp.finditserver.repository.ItemRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

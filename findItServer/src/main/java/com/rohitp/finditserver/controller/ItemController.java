@@ -1,8 +1,8 @@
 package com.rohitp.finditserver.controller;
 
-import com.rohitp.finditserver.dto.items.CreateItemRequest;
-import com.rohitp.finditserver.dto.items.ItemDTO;
-import com.rohitp.finditserver.dto.items.UpdateItemRequest;
+import com.rohitp.finditserver.dto.item.CreateItemRequest;
+import com.rohitp.finditserver.dto.item.ItemDTO;
+import com.rohitp.finditserver.dto.item.UpdateItemRequest;
 import com.rohitp.finditserver.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("v1/items")
-public class ItemsController {
+public class ItemController {
 
     private final ItemService itemService;
 
     @Autowired
-    public ItemsController(ItemService itemService) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 

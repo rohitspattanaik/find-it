@@ -7,15 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 @Entity
-@Table(name = "items")
+@Table(name = "collections")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class Item {
+public class Collection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +28,11 @@ public class Item {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id")
-    private Collection collection;
+    @JoinColumn(name = "parent_id")
+    private Collection parentCollection;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_group_id", nullable = false)
-    private UserGroup userGroup;
+    @OneToMany(mappedBy = "parentCollection")
+    private List<Collection> childrenCollections;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -43,7 +42,7 @@ public class Item {
     private User createdBy;
 
     @Column(name = "updated_at", updatable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")

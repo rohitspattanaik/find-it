@@ -1,4 +1,4 @@
-package com.rohitp.finditserver.dto.items;
+package com.rohitp.finditserver.dto.item;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.annotation.Nullable;
