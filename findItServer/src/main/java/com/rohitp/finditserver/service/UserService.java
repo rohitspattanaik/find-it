@@ -2,10 +2,12 @@ package com.rohitp.finditserver.service;
 
 import com.rohitp.finditserver.dto.user.CreateUserRequest;
 import com.rohitp.finditserver.dto.user.UpdateUserRequest;
+import com.rohitp.finditserver.exception.user.UserConflictException;
 import com.rohitp.finditserver.exception.user.UserNotFoundException;
 import com.rohitp.finditserver.model.User;
 import com.rohitp.finditserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,14 +26,29 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
+    public User getUserByEmail(String email) {
+        return this.userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+    }
+
     public User createUser(CreateUserRequest createUserRequest) {
-        return this.userRepository.save(
-                User
-                        .builder()
-                        .firstName(createUserRequest.getFirstName())
-                        .lastName(createUserRequest.getLastName())
-                        .email(createUserRequest.getEmail())
-                        .build());
+        try {
+            return this.userRepository.save(
+                    User
+                            .builder()
+                            .firstName(createUserRequest.getFirstName())
+                            .lastName(createUserRequest.getLastName())
+                            .email(createUserRequest.getEmail())
+                            .build());
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) { // postgresql error message
+                throw new UserConflictException(createUserRequest.getEmail(), e);
+            } else {
+                throw e;
+            }
+        }
+
 
     }
 

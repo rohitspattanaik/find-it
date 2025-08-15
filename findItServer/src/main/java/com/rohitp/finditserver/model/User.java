@@ -30,10 +30,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", updatable = false)
+    @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "members")

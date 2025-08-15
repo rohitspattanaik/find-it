@@ -10,6 +10,8 @@ public interface UserRepository extends Repository<User, Integer> {
 
     Optional<User> findById(Integer id);
 
+    Optional<User> findByEmail(String email);
+
     User save(User user);
 
     @Transactional

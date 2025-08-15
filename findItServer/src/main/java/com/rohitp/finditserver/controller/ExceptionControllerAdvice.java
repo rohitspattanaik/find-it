@@ -1,6 +1,8 @@
 package com.rohitp.finditserver.controller;
 
 import com.rohitp.finditserver.dto.exception.ExceptionDTO;
+import com.rohitp.finditserver.exception.base.EntityConflictException;
+import com.rohitp.finditserver.exception.base.UnauthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,20 @@ public class ExceptionControllerAdvice {
         logger.error(exception.getMessage(), exception);
         exception.getDetailMessageArguments();
         return getExceptionDTO(Arrays.toString(exception.getDetailMessageArguments()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(EntityConflictException.class)
+    public ExceptionDTO handleConflictException(EntityConflictException exception) {
+        logger.error(exception.getMessage(), exception);
+        return getExceptionDTO(exception, HttpStatus.CONFLICT);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedException.class)
+    public ExceptionDTO handleUnauthorizedException(UnauthorizedException exception) {
+        logger.error(exception.getMessage(), exception);
+        return getExceptionDTO(exception, HttpStatus.UNAUTHORIZED);
     }
 
     private ExceptionDTO getExceptionDTO(Exception exception, HttpStatus httpStatus) {

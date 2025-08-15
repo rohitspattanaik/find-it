@@ -35,14 +35,14 @@ public class Item {
     @JoinColumn(name = "user_group_id", nullable = false)
     private UserGroup userGroup;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @Column(name = "updated_at", updatable = false)
+    @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updateAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

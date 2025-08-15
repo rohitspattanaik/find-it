@@ -24,14 +24,14 @@ public class UserGroup {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @Column(name = "updated_at", updatable = false)
+    @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
