@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +25,8 @@ public class SessionFilter extends OncePerRequestFilter {
 
     private final SessionService sessionService;
 
+    public static final String SESSION_COOKIE_NAME = "findit-session";
+
     @Autowired
     public SessionFilter(SessionService sessionService) {
         this.sessionService = sessionService;
@@ -33,8 +36,9 @@ public class SessionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("SessionFilter");
         Optional<Cookie> sessionCookieOptional = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals("session"))
+                .filter(cookie -> cookie.getName().equals(SESSION_COOKIE_NAME))
                 .findFirst();
 
         Cookie sessionCookie;
@@ -44,6 +48,7 @@ public class SessionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        System.out.println("Found session cookie");
 
         // Fetch the session
         Session session;
@@ -53,9 +58,11 @@ public class SessionFilter extends OncePerRequestFilter {
             throw new InvalidSessionException(e);
         }
 
+        System.out.println("Found session");
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(session.getUserId(), null, null);
-        request.setAttribute("authenticationToken", authenticationToken);
+                UsernamePasswordAuthenticationToken.authenticated(session.getUserId(), session.getId(), null);
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
 
     }

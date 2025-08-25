@@ -63,6 +63,15 @@ create table if not exists public.sessions (
     updated_at timestamp not null default now()
 );
 
+create table if not exists public.admin_users (
+    id serial primary key,
+    user_id integer not null references public.users(id) on delete cascade,
+    created_at timestamp with time zone default now(),
+    created_by integer not null references public.users(id),
+    updated_at timestamp with time zone default now(),
+    updated_by integer not null references public.users(id)
+);
+
 create index if not exists idx_sessions_user_id on public.sessions(user_id);
 
 
@@ -103,5 +112,10 @@ execute procedure public.update_updated_at_column();
 
 create trigger update_sessions_updated_at
     before update on public.sessions
+    for each row
+execute procedure public.update_updated_at_column();
+
+create trigger update_admin_users_updated_at
+    before update on public.admin_users
     for each row
 execute procedure public.update_updated_at_column();
