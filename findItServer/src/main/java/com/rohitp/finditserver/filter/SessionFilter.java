@@ -3,6 +3,7 @@ package com.rohitp.finditserver.filter;
 import com.rohitp.finditserver.exception.authentication.InvalidSessionException;
 import com.rohitp.finditserver.exception.session.SessionNotFoundException;
 import com.rohitp.finditserver.model.Session;
+import com.rohitp.finditserver.model.User;
 import com.rohitp.finditserver.service.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,14 +12,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SessionFilter extends OncePerRequestFilter {
@@ -26,6 +28,8 @@ public class SessionFilter extends OncePerRequestFilter {
     private final SessionService sessionService;
 
     public static final String SESSION_COOKIE_NAME = "findit-session";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String GROUP_ADMIN_TEMPLATE = "GROUP_ADMIN_%s";
 
     @Autowired
     public SessionFilter(SessionService sessionService) {
@@ -36,7 +40,6 @@ public class SessionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("SessionFilter");
         Optional<Cookie> sessionCookieOptional = Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(SESSION_COOKIE_NAME))
                 .findFirst();
@@ -48,7 +51,6 @@ public class SessionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println("Found session cookie");
 
         // Fetch the session
         Session session;
@@ -58,10 +60,22 @@ public class SessionFilter extends OncePerRequestFilter {
             throw new InvalidSessionException(e);
         }
 
-        System.out.println("Found session");
+        // Determine the user's roles
+        User user = session.getUser();
+        List<GrantedAuthority> grants = new ArrayList<>();
+        if (user.getIsAdmin()) {
+            grants.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+        }
+        if (user.getGroups() != null) {
+            grants.addAll(user
+                    .getGroups()
+                    .stream()
+                    .map(group -> new SimpleGrantedAuthority(String.format(GROUP_ADMIN_TEMPLATE, group.getId())))
+                    .collect(Collectors.toSet()));
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                UsernamePasswordAuthenticationToken.authenticated(session.getUserId(), session.getId(), null);
+                UsernamePasswordAuthenticationToken.authenticated(session.getUserId(), session.getId(), grants);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
 

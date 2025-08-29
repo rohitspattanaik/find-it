@@ -23,7 +23,7 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Integer userId;
 
     @Column(name = "expires_at", nullable = false)
@@ -34,4 +34,8 @@ public class Session {
 
     @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
 }

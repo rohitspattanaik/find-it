@@ -30,13 +30,16 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "is_admin", nullable = false)
+    private Boolean isAdmin;
+
     @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "members")
+    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
     private Set<UserGroup> groups;
 
 }
