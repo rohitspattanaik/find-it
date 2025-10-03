@@ -10,4 +10,8 @@ public class SessionNotFoundException extends EntityNotFoundException {
         super(String.format("Session with id %s not found", sessionId));
     }
 
+    public SessionNotFoundException(String message) {
+        super(message);
+    }
+
 }

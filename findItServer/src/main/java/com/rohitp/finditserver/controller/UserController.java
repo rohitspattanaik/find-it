@@ -1,12 +1,15 @@
 package com.rohitp.finditserver.controller;
 
 import com.rohitp.finditserver.dto.user.CreateUserRequest;
+import com.rohitp.finditserver.dto.user.ListUsersResponse;
 import com.rohitp.finditserver.dto.user.UpdateUserRequest;
 import com.rohitp.finditserver.dto.user.UserDTO;
+import com.rohitp.finditserver.filter.SessionFilter;
 import com.rohitp.finditserver.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
@@ -24,6 +27,16 @@ public class UserController {
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
     public UserDTO getUser(@PathVariable Integer userId) {
         return UserDTO.fromUser(this.userService.getUserById(userId));
+    }
+
+    @GetMapping(value = "", produces = "application/json")
+    @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
+    @PreAuthorize(SessionFilter.HAS_ADMIN_AUTHORITY)
+    public ListUsersResponse getUsers() {
+        return ListUsersResponse
+                .builder()
+                .users(this.userService.getAllUsers().stream().map(UserDTO::fromUser).toList())
+                .build();
     }
 
     @PostMapping(value = "", produces = "application/json")

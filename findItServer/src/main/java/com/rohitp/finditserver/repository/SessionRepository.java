@@ -14,6 +14,9 @@ public interface SessionRepository extends Repository<Session, UUID> {
     Session save(Session session);
 
     @Transactional
+    Integer deleteSessionById(UUID id);
+
+    @Transactional
     Integer deleteSessionsByUserId(Integer userId);
 
 }

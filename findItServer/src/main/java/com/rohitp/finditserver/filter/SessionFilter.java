@@ -10,6 +10,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class SessionFilter extends OncePerRequestFilter {
@@ -30,6 +33,9 @@ public class SessionFilter extends OncePerRequestFilter {
     public static final String SESSION_COOKIE_NAME = "findit-session";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String GROUP_ADMIN_TEMPLATE = "GROUP_ADMIN_%s";
+    public static final String HAS_ADMIN_AUTHORITY = "hasAuthority('ROLE_ADMIN')";
+
+    private static final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
 
     @Autowired
     public SessionFilter(SessionService sessionService) {
@@ -40,8 +46,10 @@ public class SessionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        Optional<Cookie> sessionCookieOptional = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(SESSION_COOKIE_NAME))
+        Optional<Cookie> sessionCookieOptional = Optional.ofNullable(request.getCookies())
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(cookie -> SESSION_COOKIE_NAME.equals(cookie.getName()))
                 .findFirst();
 
         Cookie sessionCookie;
@@ -57,7 +65,10 @@ public class SessionFilter extends OncePerRequestFilter {
         try {
             session = this.sessionService.getSession(UUID.fromString(sessionCookie.getValue()));
         } catch (SessionNotFoundException e) {
-            throw new InvalidSessionException(e);
+            logger.error("Session not found", e);
+            // continue execution without setting authentication
+            filterChain.doFilter(request, response);
+            return;
         }
 
         // Determine the user's roles

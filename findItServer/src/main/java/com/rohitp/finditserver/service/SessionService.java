@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -31,19 +32,25 @@ public class SessionService {
         this.userService = userService;
     }
 
+    // TODO: implement authentication
     public Session authenticateUser(String email) {
         User user = this.userService.getUserByEmail(email);
 
         return this.sessionRepository.save(
                 Session
                     .builder()
-                    .userId(user.getId())
+                    .user(user)  // Set the User object directly
                     .expiresAt(LocalDateTime.now().plusMinutes(SESSION_EXPIRY_MINUTES))
                     .build());
     }
 
     public Session getSession(UUID sessionId) {
         return this.sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFoundException(sessionId));
+    }
+
+    public void deleteSession(UUID sessionId) {
+        Integer deleteCount = this.sessionRepository.deleteSessionById(sessionId);
+        logger.info("Deleted {} sessions for sessionId {}", deleteCount, sessionId);
     }
 
     public void deleteSessions(Integer userId) {
