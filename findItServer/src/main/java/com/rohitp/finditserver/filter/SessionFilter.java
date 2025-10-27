@@ -32,7 +32,7 @@ public class SessionFilter extends OncePerRequestFilter {
 
     public static final String SESSION_COOKIE_NAME = "findit-session";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
-    public static final String GROUP_ADMIN_TEMPLATE = "GROUP_ADMIN_%s";
+    public static final String GROUP_ROLE_TEMPLATE = "GROUP_%s_%s";
     public static final String HAS_ADMIN_AUTHORITY = "hasAuthority('ROLE_ADMIN')";
 
     private static final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
@@ -74,14 +74,21 @@ public class SessionFilter extends OncePerRequestFilter {
         // Determine the user's roles
         User user = session.getUser();
         List<GrantedAuthority> grants = new ArrayList<>();
-        if (user.getIsAdmin()) {
-            grants.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-        }
-        if (user.getGroups() != null) {
-            grants.addAll(user
-                    .getGroups()
+//        if (session.getIsAdmin()) {
+//            grants.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+//        }
+//        if (user.getGroups() != null) {
+//            grants.addAll(user
+//                    .getGroups()
+//                    .stream()
+//                    .map(group -> new SimpleGrantedAuthority(String.format(GROUP_ADMIN_TEMPLATE, group.getId())))
+//                    .collect(Collectors.toSet()));
+//        }
+        if (session.getClaims() != null) {
+            grants.addAll(session
+                    .getClaims()
                     .stream()
-                    .map(group -> new SimpleGrantedAuthority(String.format(GROUP_ADMIN_TEMPLATE, group.getId())))
+                    .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toSet()));
         }
 

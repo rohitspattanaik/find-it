@@ -49,7 +49,7 @@ public class AuthenticationController {
         if (sessionId == null || sessionId.isBlank()) {
             throw new SessionNotFoundException("Session was null or blank");
         }
-        return SessionDTO.fromSession(this.sessionService.getSession(UUID.fromString(sessionId)));
+        return SessionDTO.fromSession(this.sessionService.getSessionLazy(UUID.fromString(sessionId)));
     }
 
     @DeleteMapping(value = "", produces = "application/json")
@@ -72,7 +72,7 @@ public class AuthenticationController {
 
     @DeleteMapping(value = "/{userId}", produces = "application/json")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void logoutAllSessions(@PathVariable Integer userId, HttpServletResponse response) {
+    public void logoutAllSessions(@PathVariable UUID userId, HttpServletResponse response) {
         this.sessionService.deleteSessions(userId);
 
         Cookie cookie = new Cookie(SessionFilter.SESSION_COOKIE_NAME, null);

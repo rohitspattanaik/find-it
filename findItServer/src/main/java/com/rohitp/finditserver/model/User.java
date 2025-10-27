@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -19,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @Column(nullable = false)
     private String firstName;
@@ -39,7 +41,10 @@ public class User {
     @Column(name = "updated_at", updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
-    private Set<UserGroup> groups;
+//    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
+//    private Set<UserGroup> groups;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<UserGroupMember> groupMemberships;
 
 }

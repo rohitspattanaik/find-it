@@ -3,7 +3,7 @@ create type user_role as enum ('admin', 'user');
 
 -- create tables
 create table if not exists public.users (
-    id serial primary key,
+    id uuid default uuidv7() primary key,
     first_name text not null,
     last_name text not null,
     email text not null unique,
@@ -13,52 +13,54 @@ create table if not exists public.users (
 );
 
 create table if not exists public.collections (
-    id serial primary key,
+    id uuid default uuidv7() primary key,
     name text not null,
     description text,
-    parent_id integer references public.collections(id),
+    parent_id uuid references public.collections(id),
     created_at timestamp with time zone default now(),
-    created_by integer not null references public.users(id),
+    created_by uuid not null references public.users(id),
     updated_at timestamp with time zone default now(),
-    updated_by integer not null references public.users(id)
+    updated_by uuid not null references public.users(id)
 );
 
 create table if not exists public.user_groups (
-    id serial primary key,
+    id uuid default uuidv7() primary key,
     name text not null,
     created_at timestamp with time zone default now(),
-    created_by integer not null references public.users(id),
+    created_by uuid not null references public.users(id),
     updated_at timestamp with time zone default now(),
-    updated_by integer not null references public.users(id)
+    updated_by uuid not null references public.users(id)
 );
 
 create table if not exists public.items (
-    id serial primary key,
+    id uuid default uuidv7() primary key,
     name text not null,
     description text,
-    collection_id integer references public.collections(id),
-    user_group_id integer not null references public.user_groups(id),
+    collection_id uuid references public.collections(id),
+    user_group_id uuid not null references public.user_groups(id),
     created_at timestamp with time zone default now(),
-    created_by integer not null references public.users(id),
+    created_by uuid not null references public.users(id),
     updated_at timestamp with time zone default now(),
-    updated_by integer not null references public.users(id)
+    updated_by uuid not null references public.users(id)
 );
 
 create table if not exists public.user_group_members (
-    id serial primary key,
-    user_id integer not null references public.users(id) on delete cascade,
-    user_group_id integer not null references public.user_groups(id) on delete cascade,
+    id uuid default uuidv7() primary key,
+    user_id uuid not null references public.users(id) on delete cascade,
+    user_group_id uuid not null references public.user_groups(id) on delete cascade,
     role user_role not null,
     created_at timestamp with time zone default now(),
-    created_by integer not null references public.users(id),
+    created_by uuid not null references public.users(id),
     updated_at timestamp with time zone default now(),
-    updated_by integer not null references public.users(id)
+    updated_by uuid not null references public.users(id)
 );
 
 -- todo: create an index on expires_at and schedule a cron job to delete expired sessions
 create table if not exists public.sessions (
-    id uuid primary key default gen_random_uuid(),
-    user_id integer not null references public.users(id) on delete cascade,
+    id uuid default uuidv7() primary key,
+    user_id uuid not null references public.users(id) on delete cascade,
+    is_admin boolean not null,
+    claims text[],
     expires_at timestamp not null,
     created_at timestamp not null default now(),
     updated_at timestamp not null default now()

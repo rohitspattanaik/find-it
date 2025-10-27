@@ -8,6 +8,8 @@ import com.rohitp.finditserver.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ItemService {
 
@@ -18,7 +20,7 @@ public class ItemService {
         this.itemRepository = itemRepository;
     }
 
-    public Item getItemById(Integer id) {
+    public Item getItemById(UUID id) {
         return this.itemRepository
                 .findById(id)
                 .orElseThrow(ItemNotFoundException::new);
@@ -33,7 +35,7 @@ public class ItemService {
                             .build());
     }
 
-    public Item updateItem(Integer id, UpdateItemRequest updateItemRequest) {
+    public Item updateItem(UUID id, UpdateItemRequest updateItemRequest) {
         Item existingItem = getItemById(id);
 
         return this.itemRepository.save(
@@ -44,7 +46,7 @@ public class ItemService {
                         .build());
     }
 
-    public void deleteItem(Integer id) {
+    public void deleteItem(UUID id) {
         Integer deleteCount = this.itemRepository.deleteItemById(id);
 
         System.out.println(deleteCount);

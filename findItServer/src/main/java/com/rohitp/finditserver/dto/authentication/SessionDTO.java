@@ -16,7 +16,7 @@ public class SessionDTO {
 
     private UUID id;
 
-    private Integer userId;
+    private UUID userId;
 
     private Boolean isAdmin;
 
@@ -27,7 +27,7 @@ public class SessionDTO {
         return SessionDTO.builder()
                 .id(session.getId())
                 .userId(session.getUserId())
-                .isAdmin(session.getUser().getIsAdmin())
+                .isAdmin(session.getIsAdmin())
                 .expiresAt(session.getExpiresAt())
                 .build();
     }

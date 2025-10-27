@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,7 +25,13 @@ public class Session {
     private UUID id;
 
     @Column(name = "user_id", insertable = false, updatable = false, nullable = false)
-    private Integer userId;
+    private UUID userId;
+
+    @Column(name = "is_admin", nullable = false)
+    private Boolean isAdmin;
+
+    @Column(name = "claims")
+    private List<String> claims;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;

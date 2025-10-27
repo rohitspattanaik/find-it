@@ -1,5 +1,6 @@
 package com.rohitp.finditserver.dto.user;
 
+import com.rohitp.finditserver.dto.PaginationDTO;
 import jakarta.annotation.Nullable;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,6 @@ public class ListUsersResponse {
 
     private List<UserDTO> users;
 
-    @Nullable
-    private String nextPageToken;
+    private PaginationDTO pagination;
 
 }

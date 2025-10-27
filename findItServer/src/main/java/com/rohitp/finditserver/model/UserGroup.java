@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_groups")
@@ -19,7 +21,7 @@ public class UserGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -38,7 +40,10 @@ public class UserGroup {
     @JoinColumn(name = "updated_by")
     private User updatedBy;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_group_members", joinColumns = @JoinColumn(name = "user_group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> members;
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinTable(name = "user_group_members", joinColumns = @JoinColumn(name = "user_group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+//    private Set<User> members;
+
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.EAGER)
+    private List<UserGroupMember> members;
 }

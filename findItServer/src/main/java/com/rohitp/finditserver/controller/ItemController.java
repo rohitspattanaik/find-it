@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController()
 @RequestMapping("v1/items")
 public class ItemController {
@@ -22,7 +24,7 @@ public class ItemController {
 
     @GetMapping(value = "/{itemId}", produces = "application/json")
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
-    public ItemDTO getItem(@PathVariable Integer itemId) {
+    public ItemDTO getItem(@PathVariable UUID itemId) {
         return ItemDTO.fromItem(this.itemService.getItemById(itemId));
     }
 
@@ -34,13 +36,13 @@ public class ItemController {
 
     @PatchMapping(value = "/{itemId}", produces = "application/json")
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
-    public ItemDTO updateItem(@PathVariable Integer itemId, @RequestBody @Valid UpdateItemRequest updateItemRequest) {
+    public ItemDTO updateItem(@PathVariable UUID itemId, @RequestBody @Valid UpdateItemRequest updateItemRequest) {
         return ItemDTO.fromItem(this.itemService.updateItem(itemId, updateItemRequest));
     }
 
     @DeleteMapping(value = "/{itemId}", produces = "application/json")
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
-    public void deleteItem(@PathVariable Integer itemId) {
+    public void deleteItem(@PathVariable UUID itemId) {
         this.itemService.deleteItem(itemId);
     }
 
